@@ -199,21 +199,34 @@
     sel.innerHTML = `<option value="">(Select)</option>` + keys.map(k => `<option value="${escapeHtml(k)}">${escapeHtml(k)}</option>`).join("");
   }
 
-  function beep(freq=880, dur=120) {
-    if (!soundOn) return;
-    try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const o = ctx.createOscillator();
-      const g = ctx.createGain();
-      o.frequency.value = freq;
-      o.connect(g);
-      g.connect(ctx.destination);
-      o.start();
-      g.gain.setValueAtTime(0.2, ctx.currentTime);
-      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur/1000);
-      setTimeout(() => { o.stop(); ctx.close(); }, dur + 50);
-    } catch {}
-  }
+let audioCtx = null;
+
+function ensureAudio() {
+  if (!soundOn) return;
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === "suspended") audioCtx.resume().catch(()=>{});
+}
+
+function beep(freq = 880, dur = 120) {
+  if (!soundOn) return;
+  ensureAudio();
+  if (!audioCtx) return;
+
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  o.frequency.value = freq;
+
+  o.connect(g);
+  g.connect(audioCtx.destination);
+
+  const t0 = audioCtx.currentTime;
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(0.2, t0 + 0.01);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur / 1000);
+
+  o.start(t0);
+  o.stop(t0 + dur / 1000 + 0.02);
+}
 
   function vibrate(ms=150) {
     if (!vibeOn) return;
@@ -224,6 +237,7 @@
   function setTime(sec) { $("timeDisplay").textContent = fmt(Math.max(0, sec)); }
 
   function start() {
+    ensureAudio();
     if (routine.steps.length === 0) return;
     running = true; paused = false;
     roundIdx = 0; stepIdx = 0;
@@ -251,6 +265,7 @@
       announceStep(false);
     }
     setButtons();
+    ensureAudio();
   }
 
   function skip() {

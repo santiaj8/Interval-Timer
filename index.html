@@ -7,109 +7,104 @@
   <link rel="manifest" href="manifest.webmanifest" />
   <title>Interval Routines</title>
   <style>
-    :root {
-      --bg:#0b0f14;
-      --card:#131b24;
-      --text:#e8eef6;
-      --muted:#9bb0c6;
-      --accent:#4da3ff;
-      --danger:#ff5d5d;
-      --on:#1b3b5f;
-      --onBorder:#64b3ff;
-      --pillBg:#0f1520;
-      --pillBorder:rgba(255,255,255,.10);
+    :root{
+      --bg:#0b0f14; --card:#131b24; --text:#e8eef6; --muted:#9bb0c6;
+      --accent:#4da3ff; --danger:#ff5d5d; --on:#1b3b5f; --onBorder:#64b3ff;
+      --pillBg:#0f1520; --pillBorder:rgba(255,255,255,.10);
     }
-    * { box-sizing:border-box; font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial; }
-    body { margin:0; background:var(--bg); color:var(--text); padding:16px; }
-    h1 { margin:0 0 12px; font-size:22px; }
-    .card {
-      background:var(--card);
-      border-radius:14px;
-      padding:12px;
-      margin:10px 0;
-      box-shadow:0 8px 22px rgba(0,0,0,.25);
+    *{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial;}
+    body{margin:0;background:var(--bg);color:var(--text);padding:16px;}
+    h1{margin:0 0 12px;font-size:22px;}
+    .card{background:var(--card);border-radius:14px;padding:12px;margin:10px 0;box-shadow:0 8px 22px rgba(0,0,0,.25);}
+    label{display:block;font-size:12px;color:var(--muted);margin:8px 0 4px;}
+    input,select,button{
+      width:100%;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.08);
+      background:var(--pillBg);color:var(--text);font-size:16px;line-height:1.2; /* iOS zoom fix */
     }
-    label { display:block; font-size:12px; color:var(--muted); margin:8px 0 4px; }
+    button{background:var(--accent);border:none;font-weight:900;}
+    button.secondary{background:#243244;}
+    button.danger{background:var(--danger);}
+    .row{display:flex;gap:10px;}
+    .row > *{flex:1;}
 
-    /* IMPORTANT for iOS: prevent zoom on focus by keeping input font-size >= 16px */
-    input, select, button {
-      width:100%;
-      padding:10px;
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,.08);
-      background:var(--pillBg);
-      color:var(--text);
-      font-size:16px; /* prevents iOS zoom */
-      line-height:1.2;
+    .pillrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+    .pill{
+      padding:10px 12px;border-radius:999px;background:var(--pillBg);
+      border:1px solid var(--pillBorder);font-size:14px;color:var(--text);
+      user-select:none;display:inline-flex;align-items:center;gap:8px;
     }
-
-    button { background:var(--accent); border:none; font-weight:800; }
-    button.secondary { background:#243244; }
-    button.danger { background:var(--danger); }
-
-    .row { display:flex; gap:10px; }
-    .row > * { flex:1; }
-
-    .steps { margin-top:6px; }
-    .step {
-      display:flex;
-      gap:10px;
-      align-items:center;
-      padding:10px;
-      border-radius:12px;
-      background:var(--pillBg);
-      border:1px solid rgba(255,255,255,.06);
-      margin:8px 0;
-    }
-    .step .meta { flex:1; }
-    .step .name { font-weight:800; margin:0 0 2px; }
-    .step .sub { color:var(--muted); font-size:12px; }
-    .step .btns { display:flex; flex-direction:column; gap:8px; min-width:96px; }
-    .step .btns button { padding:8px; font-size:14px; border-radius:10px; }
-
-    .big { font-size:46px; font-weight:900; letter-spacing:1px; text-align:center; margin:6px 0 0; }
-    .now { font-size:16px; text-align:center; color:var(--muted); margin-top:6px; }
-
-    .pillrow { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
-
-    .pill {
-      padding:10px 12px;
-      border-radius:999px;
-      background:var(--pillBg);
-      border:1px solid var(--pillBorder);
-      font-size:14px;
-      color:var(--text);
-      user-select:none;
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-    }
-    /* MUCH more obvious active state */
-    .pill.on {
-      background:var(--on);
-      border-color:var(--onBorder);
+    .pill.on{
+      background:var(--on);border-color:var(--onBorder);
       box-shadow:0 0 0 3px rgba(100,179,255,.22) inset, 0 0 12px rgba(100,179,255,.12);
     }
-    .pill .dot {
-      width:10px; height:10px; border-radius:999px;
-      background:rgba(255,255,255,.25);
-      box-shadow:0 0 0 2px rgba(0,0,0,.18) inset;
-    }
-    .pill.on .dot {
-      background:#7fe0ff;
-      box-shadow:0 0 10px rgba(127,224,255,.45);
-    }
+    .pill .dot{width:10px;height:10px;border-radius:999px;background:rgba(255,255,255,.25);box-shadow:0 0 0 2px rgba(0,0,0,.18) inset;}
+    .pill.on .dot{background:#7fe0ff;box-shadow:0 0 10px rgba(127,224,255,.45);}
 
-    .footer { color:var(--muted); font-size:12px; margin-top:10px; line-height:1.35; }
+    .big{font-size:46px;font-weight:900;letter-spacing:1px;text-align:center;margin:6px 0 0;}
+    .now{font-size:16px;text-align:center;color:var(--muted);margin-top:6px;}
 
-    /* Flash overlay for obvious step transitions */
-    #flash {
-      position:fixed; inset:0;
-      background:#ffffff;
-      opacity:0;
-      pointer-events:none;
-      transition:opacity 120ms ease;
-      z-index:9999;
+    .steps{margin-top:6px;}
+    .step{
+      display:flex;gap:10px;align-items:center;padding:10px;border-radius:12px;
+      background:var(--pillBg);border:1px solid rgba(255,255,255,.06);margin:8px 0;
+      touch-action: none;
+    }
+    .step.dragging{opacity:.55;border-color:rgba(100,179,255,.6);}
+    .step .handle{
+      width:28px;min-width:28px;height:40px;border-radius:10px;
+      background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.10);
+      display:flex;align-items:center;justify-content:center;
+      color:rgba(255,255,255,.55);font-weight:1000;
+      cursor:grab;
+    }
+    .step .meta{flex:1;}
+    .step .name{font-weight:1000;margin:0 0 2px;}
+    .step .sub{color:var(--muted);font-size:12px;}
+
+    .step .btns{display:flex;flex-direction:column;gap:8px;min-width:96px;}
+    .step .btns button{padding:8px;font-size:14px;border-radius:10px;}
+
+    /* Reorder mode (A): minimal UI */
+    .reorder-mode .step .handle{
+      width:40px;min-width:40px;height:52px;border-radius:14px;
+      color:rgba(255,255,255,.85);
+      border-color:rgba(100,179,255,.35);
+      box-shadow:0 0 0 3px rgba(100,179,255,.12) inset;
+    }
+    .reorder-mode .step .btns{display:none;}
+    .reorder-mode .step .trashBtn{
+      display:inline-flex;
+      width:44px;min-width:44px;height:44px;
+      border-radius:12px;
+      align-items:center;justify-content:center;
+      font-weight:1000;
+      background:rgba(255,93,93,.9);
+      border:none;
+      color:#fff;
+    }
+    .trashBtn{display:none;} /* shown only in reorder-mode */
+
+    .footer{color:var(--muted);font-size:12px;margin-top:10px;line-height:1.35;}
+
+    #flash{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;transition:opacity 120ms ease;z-index:9999;}
+
+    /* Countdown overlay */
+    #countdownOverlay{
+      position:fixed; inset:0; display:none;
+      align-items:center; justify-content:center;
+      background:rgba(11,15,20,.65);
+      z-index:9998;
+      backdrop-filter: blur(2px);
+    }
+    #countdownNumber{
+      font-size:120px;
+      font-weight:1000;
+      line-height:1;
+      padding:24px 34px;
+      border-radius:24px;
+      border:2px solid rgba(100,179,255,.55);
+      background:rgba(19,27,36,.85);
+      box-shadow:0 0 0 6px rgba(100,179,255,.12) inset, 0 0 24px rgba(0,0,0,.45);
     }
   </style>
 </head>
@@ -147,34 +142,38 @@
 
     <div class="row">
       <div>
-        <label>Load saved routine</label>
+        <label>Saved routines</label>
         <select id="savedSelect"></select>
       </div>
       <div>
         <label>&nbsp;</label>
-        <button class="secondary" id="loadRoutine">Load as 1 step</button>
+        <button class="secondary" id="addRoutineAsStep">Add saved routine to steps</button>
       </div>
     </div>
 
-    <div class="row">
+    <div class="row" style="margin-top:8px;">
       <div>
-        <label>Alerts (active = highlighted)</label>
-        <div class="pillrow">
-          <span class="pill on" id="soundPill"><span class="dot"></span>Sound</span>
-          <span class="pill on" id="vibePill"><span class="dot"></span>Vibrate</span>
-          <span class="pill on" id="voicePill"><span class="dot"></span>Voice</span>
-          <span class="pill" id="prepPill"><span class="dot"></span>3s Prep Beeps</span>
-          <span class="pill on" id="flashPill"><span class="dot"></span>Flash</span>
-        </div>
+        <button class="secondary" id="loadRoutineReplace">Replace steps with selected routine (1 step)</button>
       </div>
       <div>
-        <label>&nbsp;</label>
         <button class="danger" id="clearAll">Clear routine</button>
       </div>
     </div>
 
-    <div class="footer">
-      Start includes an automatic <b>5-second countdown</b>. Tip: Add a “Rest” step like any other.
+    <div style="margin-top:10px;">
+      <label>Settings (active = highlighted)</label>
+      <div class="pillrow">
+        <span class="pill on" id="soundPill"><span class="dot"></span>Sound</span>
+        <span class="pill on" id="vibePill"><span class="dot"></span>Vibrate</span>
+        <span class="pill on" id="voicePill"><span class="dot"></span>Voice</span>
+        <span class="pill" id="prepPill"><span class="dot"></span>3s Prep Beeps</span>
+        <span class="pill on" id="flashPill"><span class="dot"></span>Flash</span>
+        <span class="pill" id="reorderPill"><span class="dot"></span>Reorder Mode</span>
+        <span class="pill" id="awakePill"><span class="dot"></span>Keep Awake</span>
+      </div>
+      <div class="footer">
+        Start includes a <b>5-second spoken countdown</b> (5…4…3…2…1…Begin). Keep Awake is best-effort on iPhone.
+      </div>
     </div>
   </div>
 
@@ -193,253 +192,349 @@
   </div>
 
   <div class="card">
-    <div style="font-weight:900;margin-bottom:6px;">Steps</div>
+    <div style="font-weight:1000;margin-bottom:6px;">Steps (drag handle to reorder)</div>
     <div class="steps" id="steps"></div>
   </div>
 
   <div id="flash"></div>
 
+  <div id="countdownOverlay">
+    <div id="countdownNumber">5</div>
+  </div>
+
 <script>
   const $ = (id) => document.getElementById(id);
 
-  const STORE_KEY = "interval_routines_v2";
-  const CURRENT_KEY = "interval_current_v2";
+  const STORE_KEY = "interval_routines_v4";
+  const CURRENT_KEY = "interval_current_v4";
 
   /** @typedef {{name:string, seconds:number}} Step */
   /** @typedef {{name:string, rounds:number, steps:Step[]}} Routine */
 
-  function loadStore() {
-    try { return JSON.parse(localStorage.getItem(STORE_KEY) || "{}"); }
-    catch { return {}; }
-  }
-  function saveStore(store) { localStorage.setItem(STORE_KEY, JSON.stringify(store)); }
-
-  function loadCurrent() {
-    try { return JSON.parse(localStorage.getItem(CURRENT_KEY) || "null"); }
-    catch { return null; }
-  }
-  function saveCurrent(r) { localStorage.setItem(CURRENT_KEY, JSON.stringify(r)); }
+  function loadStore(){ try { return JSON.parse(localStorage.getItem(STORE_KEY) || "{}"); } catch { return {}; } }
+  function saveStore(store){ localStorage.setItem(STORE_KEY, JSON.stringify(store)); }
+  function loadCurrent(){ try { return JSON.parse(localStorage.getItem(CURRENT_KEY) || "null"); } catch { return null; } }
+  function saveCurrent(r){ localStorage.setItem(CURRENT_KEY, JSON.stringify(r)); }
 
   let routine = loadCurrent() || /** @type {Routine} */ ({ name:"", rounds:1, steps:[] });
 
-  // Alert toggles
-  let soundOn = true;
-  let vibeOn = true;
-  let voiceOn = true;
-  let prepBeeps = false;
-  let flashOn = true;
+  // toggles
+  let soundOn=true, vibeOn=true, voiceOn=true, prepBeeps=false, flashOn=true;
+  let reorderMode=false;
+  let keepAwake=false;
 
-  // Timer state
-  let running = false;
-  let paused = false;
-  let tick = null;
+  // wake lock
+  let wakeLock = null;
 
-  let roundIdx = 0;     // 0-based
-  let stepIdx = 0;      // 0-based
-  let remaining = 0;    // seconds
+  // timer state
+  let running=false, paused=false, tick=null;
+  let roundIdx=0, stepIdx=0, remaining=0;
 
-  // Start countdown state
-  let inCountdown = false;
-  let countdownRemaining = 0;
+  // countdown state
+  let inCountdown=false;
+  let countdownRemaining=0;
 
-  // One persistent audio context (iOS PWA reliable beeps)
-  let audioCtx = null;
+  // persistent audio context
+  let audioCtx=null;
 
-  function fmt(sec) {
-    const m = Math.floor(sec / 60);
-    const s = sec % 60;
-    return String(m).padStart(2,"0") + ":" + String(s).padStart(2,"0");
+  function fmt(sec){
+    const m=Math.floor(sec/60);
+    const s=sec%60;
+    return String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");
+  }
+  function setNowText(t){ $("nowDisplay").textContent=t; }
+  function setTime(sec){ $("timeDisplay").textContent=fmt(Math.max(0,sec)); }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g,(c)=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
   }
 
-  function escapeHtml(s) {
-    return String(s).replace(/[&<>"']/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+  function totalSecondsOfRoutine(r){
+    const perRound=r.steps.reduce((acc,st)=>acc+(Number(st.seconds)||0),0);
+    const rounds=Math.max(1,Number(r.rounds)||1);
+    return perRound*rounds;
   }
 
-  function setButtons() {
-    $("startBtn").disabled = routine.steps.length === 0 || running;
-    $("pauseBtn").disabled = !running;
-    $("skipBtn").disabled = !running;
-    $("stopBtn").disabled = !running;
-    $("pauseBtn").textContent = paused ? "Resume" : "Pause";
-  }
+  function setPill(el,on){ el.classList.toggle("on",!!on); }
 
-  function setNowText(text) { $("nowDisplay").textContent = text; }
-  function setTime(sec) { $("timeDisplay").textContent = fmt(Math.max(0, sec)); }
-
-  function categoriesFromTasks() { /* placeholder in case you add later */ }
-
-  function totalSecondsOfRoutine(r) {
-    const perRound = r.steps.reduce((acc, st) => acc + (Number(st.seconds) || 0), 0);
-    const rounds = Math.max(1, Number(r.rounds) || 1);
-    return perRound * rounds;
-  }
-
-  // ---------- Alerts ----------
-  function ensureAudio() {
-    if (!soundOn) return;
-    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    if (audioCtx.state === "suspended") audioCtx.resume().catch(()=>{});
-  }
-
-  function beep(freq = 880, dur = 140, gain = 0.40) {
-    if (!soundOn) return;
-    ensureAudio();
-    if (!audioCtx) return;
-
-    const o = audioCtx.createOscillator();
-    const g = audioCtx.createGain();
-
-    o.frequency.value = freq;
-    o.connect(g);
-    g.connect(audioCtx.destination);
-
-    const t0 = audioCtx.currentTime;
-    g.gain.setValueAtTime(0.0001, t0);
-    g.gain.exponentialRampToValueAtTime(gain, t0 + 0.01);
-    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur / 1000);
-
-    o.start(t0);
-    o.stop(t0 + dur / 1000 + 0.03);
-  }
-
-  function stepAlert() {
-    // Very noticeable triple-beep pattern
-    beep(1040, 120, 0.45);
-    setTimeout(() => beep(880, 120, 0.45), 170);
-    setTimeout(() => beep(740, 150, 0.45), 340);
-  }
-
-  function vibrate(ms = 180) {
-    if (!vibeOn) return;
-    if (navigator.vibrate) navigator.vibrate(ms);
-  }
-
-  function flash() {
-    if (!flashOn) return;
-    const f = $("flash");
-    f.style.opacity = "0.65";
-    setTimeout(() => f.style.opacity = "0", 160);
-  }
-
-  // Voice: iOS does not let web apps force volume above system volume.
-  // We set utterance.volume=1.0 (max), but actual loudness depends on device volume.
-  function pickVoice() {
-    try {
-      const voices = speechSynthesis.getVoices?.() || [];
-      // Prefer iOS "Samantha" if present; otherwise any en-US; otherwise first voice.
-      return voices.find(v => /Samantha/i.test(v.name)) ||
-             voices.find(v => /en-US/i.test(v.lang)) ||
-             voices.find(v => /^en/i.test(v.lang)) ||
-             voices[0] || null;
+  // ---------- Wake lock (best-effort) ----------
+  async function enableWakeLock(){
+    try{
+      if(!("wakeLock" in navigator) || !navigator.wakeLock?.request) throw new Error("WakeLock unsupported");
+      wakeLock = await navigator.wakeLock.request("screen");
+      keepAwake = true;
+      setPill($("awakePill"), true);
+      // re-request if released (some devices do this)
+      wakeLock.addEventListener?.("release", () => { /* will be handled on visibility change */ });
     } catch {
-      return null;
+      keepAwake = false;
+      wakeLock = null;
+      setPill($("awakePill"), false);
+      // no alert spam; just fail quietly
     }
   }
 
-  function speak(text) {
-    if (!voiceOn) return;
-    if (!("speechSynthesis" in window)) return;
+  async function disableWakeLock(){
+    try{ await wakeLock?.release?.(); } catch {}
+    wakeLock = null;
+    keepAwake = false;
+    setPill($("awakePill"), false);
+  }
 
-    try {
-      const u = new SpeechSynthesisUtterance(String(text));
-      const v = pickVoice();
-      if (v) u.voice = v;
+  document.addEventListener("visibilitychange", async () => {
+    // If user left and came back, try to reacquire if keepAwake toggled on
+    if (document.visibilityState === "visible" && keepAwake) {
+      await enableWakeLock();
+    }
+  });
 
-      u.lang = (v && v.lang) ? v.lang : "en-US";
-      u.volume = 1.0; // max allowed by API
-      u.rate = 1.0;
-      u.pitch = 1.0;
+  // ---------- Alerts ----------
+  function ensureAudio(){
+    if(!soundOn) return;
+    if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    if(audioCtx.state==="suspended") audioCtx.resume().catch(()=>{});
+  }
 
-      // Cancel any queued speech and speak immediately
+  function beep(freq=880,dur=140,gain=0.40){
+    if(!soundOn) return;
+    ensureAudio();
+    if(!audioCtx) return;
+    const o=audioCtx.createOscillator();
+    const g=audioCtx.createGain();
+    o.frequency.value=freq;
+    o.connect(g);
+    g.connect(audioCtx.destination);
+    const t0=audioCtx.currentTime;
+    g.gain.setValueAtTime(0.0001,t0);
+    g.gain.exponentialRampToValueAtTime(gain,t0+0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001,t0+dur/1000);
+    o.start(t0);
+    o.stop(t0+dur/1000+0.03);
+  }
+
+  function stepAlert(){
+    beep(1040,120,0.45);
+    setTimeout(()=>beep(880,120,0.45),170);
+    setTimeout(()=>beep(740,150,0.45),340);
+  }
+
+  function vibrate(ms=180){
+    if(!vibeOn) return;
+    if(navigator.vibrate) navigator.vibrate(ms);
+  }
+
+  function flash(){
+    if(!flashOn) return;
+    const f=$("flash");
+    f.style.opacity="0.65";
+    setTimeout(()=>f.style.opacity="0",160);
+  }
+
+  function pickVoice(){
+    try{
+      const voices=speechSynthesis.getVoices?.()||[];
+      return voices.find(v=>/Samantha/i.test(v.name)) ||
+             voices.find(v=>/en-US/i.test(v.lang)) ||
+             voices.find(v=>/^en/i.test(v.lang)) ||
+             voices[0] || null;
+    }catch{return null;}
+  }
+
+  function speak(text){
+    if(!voiceOn) return;
+    if(!("speechSynthesis" in window)) return;
+    try{
+      const u=new SpeechSynthesisUtterance(String(text));
+      const v=pickVoice();
+      if(v) u.voice=v;
+      u.lang=(v&&v.lang)?v.lang:"en-US";
+      u.volume=1.0;
+      u.rate=1.0;
+      u.pitch=1.0;
       speechSynthesis.cancel();
       speechSynthesis.speak(u);
-    } catch {}
+    }catch{}
+  }
+
+  // ---------- Countdown UI ----------
+  function showCountdown(n){
+    const ov=$("countdownOverlay");
+    const num=$("countdownNumber");
+    if(n<=0){ ov.style.display="none"; return; }
+    num.textContent=String(n);
+    ov.style.display="flex";
+  }
+
+  // ---------- Buttons ----------
+  function setButtons(){
+    $("startBtn").disabled=routine.steps.length===0||running;
+    $("pauseBtn").disabled=!running;
+    $("skipBtn").disabled=!running;
+    $("stopBtn").disabled=!running;
+    $("pauseBtn").textContent=paused ? "Resume" : "Pause";
+  }
+
+  // -------- Reorder (drag & touch) --------
+  let dragFromIndex=null;
+
+  function moveStep(from, to){
+    const arr=routine.steps;
+    const item=arr.splice(from,1)[0];
+    arr.splice(to,0,item);
+    saveCurrent(routine);
+    renderSteps();
+  }
+
+  function attachDragHandlers(){
+    // HTML drag/drop works in some contexts; touch fallback covers iPhone
+    document.querySelectorAll(".step[draggable='true']").forEach(el=>{
+      el.addEventListener("dragstart",(e)=>{
+        dragFromIndex=Number(el.dataset.index);
+        el.classList.add("dragging");
+        e.dataTransfer.effectAllowed="move";
+      });
+      el.addEventListener("dragend",()=>{ el.classList.remove("dragging"); });
+      el.addEventListener("dragover",(e)=>{ e.preventDefault(); e.dataTransfer.dropEffect="move"; });
+      el.addEventListener("drop",(e)=>{
+        e.preventDefault();
+        const toIndex=Number(el.dataset.index);
+        if(dragFromIndex===null||toIndex===dragFromIndex) return;
+        moveStep(dragFromIndex,toIndex);
+        dragFromIndex=null;
+      });
+    });
+
+    // Pointer-based reorder on handle (reliable on iPhone PWA)
+    document.querySelectorAll(".handle").forEach(handle=>{
+      let active=false;
+      let startIndex=null;
+
+      handle.onpointerdown=(e)=>{
+        if(!reorderMode) return; // only in reorder mode
+        e.preventDefault();
+        active=true;
+        startIndex=Number(handle.closest(".step").dataset.index);
+        handle.setPointerCapture?.(e.pointerId);
+        handle.closest(".step").classList.add("dragging");
+      };
+
+      handle.onpointermove=(e)=>{
+        if(!active) return;
+        const elUnder=document.elementFromPoint(e.clientX,e.clientY);
+        const stepEl=elUnder?.closest?.(".step");
+        if(stepEl){
+          const targetIndex=Number(stepEl.dataset.index);
+          if(!Number.isNaN(targetIndex) && targetIndex!==startIndex){
+            moveStep(startIndex,targetIndex);
+            startIndex=targetIndex;
+          }
+        }
+      };
+
+      handle.onpointerup=()=>{
+        if(!active) return;
+        active=false;
+        const step=handle.closest(".step");
+        step.classList.remove("dragging");
+      };
+      handle.onpointercancel=handle.onpointerup;
+    });
   }
 
   // ---------- Render ----------
-  function renderSteps() {
-    const wrap = $("steps");
-    if (routine.steps.length === 0) {
-      wrap.innerHTML = `<div style="color:var(--muted);">No steps yet.</div>`;
+  function renderSteps(){
+    const wrap=$("steps");
+
+    // toggle reorder mode class on body
+    document.body.classList.toggle("reorder-mode", reorderMode);
+
+    if(routine.steps.length===0){
+      wrap.innerHTML=`<div style="color:var(--muted);">No steps yet.</div>`;
       return;
     }
-    wrap.innerHTML = routine.steps.map((st, i) => `
-      <div class="step">
-        <div class="meta">
-          <div class="name">${escapeHtml(st.name || "Step")}</div>
-          <div class="sub">${st.seconds}s</div>
+
+    wrap.innerHTML=routine.steps.map((st,i)=>{
+      const safeName = escapeHtml(st.name||"Step");
+      const safeSec = Number(st.seconds)||0;
+
+      if(reorderMode){
+        // Minimal UI: handle + meta + trash
+        return `
+          <div class="step" draggable="false" data-index="${i}">
+            <div class="handle" title="Drag to reorder">≡</div>
+            <div class="meta">
+              <div class="name">${safeName}</div>
+              <div class="sub">${safeSec}s</div>
+            </div>
+            <button class="trashBtn" onclick="removeStep(${i})" aria-label="Delete">🗑</button>
+          </div>
+        `;
+      }
+
+      // Normal mode: allow drag (desktop) + buttons
+      return `
+        <div class="step" draggable="true" data-index="${i}">
+          <div class="handle" title="Enable Reorder Mode to drag">≡</div>
+          <div class="meta">
+            <div class="name">${safeName}</div>
+            <div class="sub">${safeSec}s</div>
+          </div>
+          <div class="btns">
+            <button class="secondary" onclick="moveUp(${i})">Up</button>
+            <button class="secondary" onclick="moveDown(${i})">Down</button>
+            <button class="danger" onclick="removeStep(${i})">Delete</button>
+          </div>
         </div>
-        <div class="btns">
-          <button class="secondary" onclick="moveUp(${i})">Up</button>
-          <button class="secondary" onclick="moveDown(${i})">Down</button>
-          <button class="danger" onclick="removeStep(${i})">Delete</button>
-        </div>
-      </div>
-    `).join("");
+      `;
+    }).join("");
+
+    attachDragHandlers();
   }
 
-  function syncInputs() {
-    $("routineName").value = routine.name || "";
-    $("rounds").value = String(routine.rounds || 1);
+  function syncInputs(){
+    $("routineName").value=routine.name||"";
+    $("rounds").value=String(routine.rounds||1);
   }
 
-  function refreshSavedList() {
-    const store = loadStore();
-    const sel = $("savedSelect");
-    const keys = Object.keys(store).sort((a,b)=>a.localeCompare(b));
-    sel.innerHTML = `<option value="">(Select)</option>` + keys.map(k => `<option value="${escapeHtml(k)}">${escapeHtml(k)}</option>`).join("");
+  function refreshSavedList(){
+    const store=loadStore();
+    const sel=$("savedSelect");
+    const keys=Object.keys(store).sort((a,b)=>a.localeCompare(b));
+    sel.innerHTML=`<option value="">(Select)</option>`+keys.map(k=>`<option value="${escapeHtml(k)}">${escapeHtml(k)}</option>`).join("");
   }
 
-  // ---------- Step editing ----------
-  window.removeStep = (i) => {
-    routine.steps.splice(i, 1);
+  // expose actions
+  window.removeStep=(i)=>{
+    routine.steps.splice(i,1);
     saveCurrent(routine);
     renderSteps();
     setButtons();
   };
-  window.moveUp = (i) => {
-    if (i <= 0) return;
-    const t = routine.steps[i-1];
-    routine.steps[i-1] = routine.steps[i];
-    routine.steps[i] = t;
-    saveCurrent(routine);
-    renderSteps();
-  };
-  window.moveDown = (i) => {
-    if (i >= routine.steps.length - 1) return;
-    const t = routine.steps[i+1];
-    routine.steps[i+1] = routine.steps[i];
-    routine.steps[i] = t;
-    saveCurrent(routine);
-    renderSteps();
-  };
+  window.moveUp=(i)=>{ if(i<=0) return; moveStep(i,i-1); };
+  window.moveDown=(i)=>{ if(i>=routine.steps.length-1) return; moveStep(i,i+1); };
 
   // ---------- Timer engine ----------
-  function announceStep(isNew) {
-    const st = routine.steps[stepIdx];
-    const roundText = `Round ${roundIdx + 1}/${routine.rounds}`;
-    const stepText = `${st.name} (${st.seconds}s)`;
+  function announceStep(isNew){
+    const st=routine.steps[stepIdx];
+    const roundText=`Round ${roundIdx+1}/${routine.rounds}`;
+    const stepText=`${st.name} (${st.seconds}s)`;
     setNowText(`${roundText} • ${stepText}`);
     setTime(remaining);
-
-    if (isNew) {
-      flash();
-      stepAlert();
-      vibrate(220);
+    if(isNew){
+      flash(); stepAlert(); vibrate(220);
       speak(st.name);
     }
   }
 
-  function advance() {
+  function advance(){
     stepIdx++;
-    if (stepIdx >= routine.steps.length) {
-      stepIdx = 0;
+    if(stepIdx>=routine.steps.length){
+      stepIdx=0;
       roundIdx++;
-      if (roundIdx >= routine.rounds) {
+      if(roundIdx>=routine.rounds){
         flash();
-        // finish pattern
-        beep(660, 220, 0.50);
-        setTimeout(() => beep(880, 240, 0.50), 260);
+        beep(660,220,0.50);
+        setTimeout(()=>beep(880,240,0.50),260);
         vibrate(300);
         stop();
         setNowText("Finished ✅");
@@ -447,117 +542,116 @@
         return;
       }
     }
-    remaining = routine.steps[stepIdx].seconds;
+    remaining=routine.steps[stepIdx].seconds;
     announceStep(true);
   }
 
-  function onTick() {
-    if (!running || paused) return;
+  function onTick(){
+    if(!running || paused) return;
 
-    // Countdown mode
-    if (inCountdown) {
+    if(inCountdown){
+      showCountdown(countdownRemaining);
       setNowText(`Starting in ${countdownRemaining}...`);
       setTime(countdownRemaining);
 
-      // Beep each second; slightly higher for "1"
-      if (countdownRemaining > 1) beep(520, 80, 0.35);
-      if (countdownRemaining === 1) beep(780, 120, 0.45);
+      // Speak number + beep (more obvious)
+      speak(String(countdownRemaining));
+      if(countdownRemaining > 1) beep(520,80,0.35);
+      if(countdownRemaining === 1) beep(780,120,0.45);
 
       countdownRemaining -= 1;
 
-      if (countdownRemaining <= 0) {
-        inCountdown = false;
-        // Start first step
-        roundIdx = 0;
-        stepIdx = 0;
-        remaining = routine.steps[0].seconds;
+      if(countdownRemaining <= 0){
+        inCountdown=false;
+        showCountdown(0);
+        speak("Begin");
+        flash();
+        stepAlert();
+        roundIdx=0; stepIdx=0;
+        remaining=routine.steps[0].seconds;
         announceStep(true);
       }
       return;
     }
 
-    // Normal step mode
-    if (prepBeeps && remaining <= 3 && remaining > 0) {
-      beep(520, 80, 0.30);
-    }
+    if(prepBeeps && remaining <= 3 && remaining > 0) beep(520,80,0.30);
 
     remaining -= 1;
     setTime(remaining);
 
-    if (remaining <= 0) {
-      // step complete
-      beep(980, 150, 0.45);
+    if(remaining <= 0){
+      beep(980,150,0.45);
       vibrate(150);
       advance();
     }
   }
 
-  function start() {
-    if (routine.steps.length === 0) return;
+  function start(){
+    if(routine.steps.length===0) return;
+    running=true; paused=false;
 
-    running = true;
-    paused = false;
-
-    // Unlock audio and speech context via user gesture
+    // unlock audio/speech via user gesture
     ensureAudio();
-    try { speechSynthesis.cancel(); } catch {}
+    try{ speechSynthesis.cancel(); }catch{}
 
-    // Automatic 5-second countdown
-    inCountdown = true;
-    countdownRemaining = 5;
+    // optionally keep screen awake while running
+    if(keepAwake) enableWakeLock();
+
+    inCountdown=true;
+    countdownRemaining=5;
+    showCountdown(countdownRemaining);
     setButtons();
 
-    flash();
-    speak("Starting in five");
     setTime(countdownRemaining);
     setNowText(`Starting in ${countdownRemaining}...`);
+    speak("5");
 
-    if (tick) clearInterval(tick);
-    tick = setInterval(onTick, 1000);
+    if(tick) clearInterval(tick);
+    tick=setInterval(onTick,1000);
   }
 
-  function stop() {
-    running = false;
-    paused = false;
-    inCountdown = false;
-    countdownRemaining = 0;
+  function stop(){
+    running=false; paused=false;
+    inCountdown=false; countdownRemaining=0;
+    showCountdown(0);
 
-    if (tick) clearInterval(tick);
-    tick = null;
+    if(tick) clearInterval(tick);
+    tick=null;
+
+    // release wake lock
+    if(wakeLock) disableWakeLock();
 
     setButtons();
     setTime(0);
   }
 
-  function pauseToggle() {
-    if (!running) return;
-    paused = !paused;
+  function pauseToggle(){
+    if(!running) return;
+    paused=!paused;
 
-    if (!paused) {
+    if(!paused){
       ensureAudio();
+      if(keepAwake) enableWakeLock();
       setNowText("Resumed.");
-      // Re-announce current state for clarity
-      if (inCountdown) {
-        setNowText(`Starting in ${countdownRemaining}...`);
-      } else {
-        announceStep(false);
-      }
+      if(inCountdown) setNowText(`Starting in ${countdownRemaining}...`);
+      else announceStep(false);
     } else {
       setNowText("Paused.");
-      try { speechSynthesis.cancel(); } catch {}
+      try{ speechSynthesis.cancel(); }catch{}
+      if(wakeLock) disableWakeLock();
     }
     setButtons();
   }
 
-  function skip() {
-    if (!running) return;
-
-    if (inCountdown) {
-      // Skip countdown: start immediately
-      inCountdown = false;
-      roundIdx = 0;
-      stepIdx = 0;
-      remaining = routine.steps[0].seconds;
+  function skip(){
+    if(!running) return;
+    if(inCountdown){
+      inCountdown=false;
+      showCountdown(0);
+      speak("Begin");
+      flash(); stepAlert();
+      roundIdx=0; stepIdx=0;
+      remaining=routine.steps[0].seconds;
       announceStep(true);
       return;
     }
@@ -565,79 +659,88 @@
   }
 
   // ---------- UI handlers ----------
-  $("addStep").addEventListener("click", () => {
-    const name = $("stepName").value.trim() || "Step";
-    const sec = Math.max(1, parseInt($("stepSeconds").value || "30", 10));
-    routine.steps.push({ name, seconds: sec });
+  $("addStep").addEventListener("click",()=>{
+    const name=$("stepName").value.trim()||"Step";
+    const sec=Math.max(1,parseInt($("stepSeconds").value||"30",10));
+    routine.steps.push({name,seconds:sec});
     saveCurrent(routine);
-
-    $("stepName").value = "";
-    $("stepSeconds").value = "30";
-
+    $("stepName").value="";
+    $("stepSeconds").value="30";
     renderSteps();
     setButtons();
   });
 
-  $("routineName").addEventListener("input", (e) => {
-    routine.name = e.target.value.trim();
+  $("routineName").addEventListener("input",(e)=>{
+    routine.name=e.target.value.trim();
     saveCurrent(routine);
   });
 
-  $("rounds").addEventListener("change", (e) => {
-    const v = Math.max(1, parseInt(e.target.value || "1", 10));
-    routine.rounds = v;
+  $("rounds").addEventListener("change",(e)=>{
+    routine.rounds=Math.max(1,parseInt(e.target.value||"1",10));
     saveCurrent(routine);
   });
 
-  $("saveRoutine").addEventListener("click", () => {
-    const nm = (routine.name || "").trim();
-    if (!nm) { alert("Give the routine a name first."); return; }
-    const store = loadStore();
-    store[nm] = routine;
+  $("saveRoutine").addEventListener("click",()=>{
+    const nm=(routine.name||"").trim();
+    if(!nm){ alert("Give the routine a name first."); return; }
+    const store=loadStore();
+    store[nm]=routine;
     saveStore(store);
     refreshSavedList();
-    flash();
-    stepAlert();
-    vibrate(120);
+    flash(); stepAlert(); vibrate(120);
     speak("Saved");
   });
 
-  // Change #3: Load saved routine as ONE combined step (and clear current steps)
-  $("loadRoutine").addEventListener("click", () => {
-    const key = $("savedSelect").value;
-    if (!key) return;
+  // Add saved routine as ONE combined step (append)
+  $("addRoutineAsStep").addEventListener("click",()=>{
+    const key=$("savedSelect").value;
+    if(!key) return;
+    const store=loadStore();
+    const saved=store[key];
+    if(!saved) return;
 
-    const store = loadStore();
-    const saved = store[key];
-    if (!saved) return;
+    const total=totalSecondsOfRoutine(saved);
+    routine.steps.push({ name:key, seconds: total });
+    saveCurrent(routine);
 
-    const total = totalSecondsOfRoutine(saved);
+    renderSteps();
+    setButtons();
 
-    // Clear current steps and insert single combined step
-    routine.steps = [{ name: key, seconds: total }];
-    routine.name = (routine.name || "").trim() || "Combined Routine";
-    routine.rounds = 1;
+    flash(); stepAlert(); vibrate(140);
+    speak("Added");
+  });
+
+  // Replace steps with selected routine as ONE combined step
+  $("loadRoutineReplace").addEventListener("click",()=>{
+    const key=$("savedSelect").value;
+    if(!key) return;
+    const store=loadStore();
+    const saved=store[key];
+    if(!saved) return;
+
+    const total=totalSecondsOfRoutine(saved);
+    routine.steps=[{ name:key, seconds: total }];
+    routine.rounds=1;
+    routine.name=(routine.name||"").trim() || "Combined Routine";
 
     saveCurrent(routine);
     syncInputs();
     renderSteps();
     setButtons();
 
-    flash();
-    stepAlert();
-    vibrate(140);
+    flash(); stepAlert(); vibrate(140);
     speak("Loaded");
   });
 
-  $("clearAll").addEventListener("click", () => {
-    if (!confirm("Clear the current routine steps?")) return;
-    routine.steps = [];
+  $("clearAll").addEventListener("click",()=>{
+    if(!confirm("Clear the current routine steps?")) return;
+    routine.steps=[];
     saveCurrent(routine);
     renderSteps();
     setButtons();
     setTime(0);
     setNowText("Cleared.");
-    try { speechSynthesis.cancel(); } catch {}
+    try{ speechSynthesis.cancel(); }catch{}
   });
 
   $("startBtn").addEventListener("click", start);
@@ -645,31 +748,46 @@
   $("skipBtn").addEventListener("click", skip);
   $("stopBtn").addEventListener("click", stop);
 
-  function setPill(el, on) {
-    el.classList.toggle("on", !!on);
-  }
+  // Pills
+  $("soundPill").addEventListener("click",()=>{ soundOn=!soundOn; setPill($("soundPill"),soundOn); ensureAudio(); beep(740,80,0.35); });
+  $("vibePill").addEventListener("click",()=>{ vibeOn=!vibeOn; setPill($("vibePill"),vibeOn); vibrate(80); });
+  $("voicePill").addEventListener("click",()=>{ voiceOn=!voiceOn; setPill($("voicePill"),voiceOn); if(voiceOn) speak("Voice on"); else try{speechSynthesis.cancel();}catch{} });
+  $("prepPill").addEventListener("click",()=>{ prepBeeps=!prepBeeps; setPill($("prepPill"),prepBeeps); beep(740,80,0.35); });
+  $("flashPill").addEventListener("click",()=>{ flashOn=!flashOn; setPill($("flashPill"),flashOn); flash(); });
 
-  // Toggle pills (Change #4 makes active state very obvious)
-  $("soundPill").addEventListener("click", () => { soundOn = !soundOn; setPill($("soundPill"), soundOn); ensureAudio(); beep(740, 80, 0.35); });
-  $("vibePill").addEventListener("click", () => { vibeOn = !vibeOn; setPill($("vibePill"), vibeOn); vibrate(80); });
-  $("voicePill").addEventListener("click", () => { voiceOn = !voiceOn; setPill($("voicePill"), voiceOn); if (voiceOn) speak("Voice on"); else try { speechSynthesis.cancel(); } catch {} });
-  $("prepPill").addEventListener("click", () => { prepBeeps = !prepBeeps; setPill($("prepPill"), prepBeeps); beep(740, 80, 0.35); });
-  $("flashPill").addEventListener("click", () => { flashOn = !flashOn; setPill($("flashPill"), flashOn); flash(); });
+  $("reorderPill").addEventListener("click",()=>{
+    reorderMode=!reorderMode;
+    setPill($("reorderPill"), reorderMode);
+    // When reorder mode is ON, encourage handle dragging only
+    if(reorderMode) speak("Reorder mode");
+    renderSteps();
+  });
 
-  // Offline support
-  if ("serviceWorker" in navigator) {
+  $("awakePill").addEventListener("click", async ()=>{
+    if(keepAwake){
+      await disableWakeLock();
+    } else {
+      keepAwake = true; // optimistic, may be flipped off if unsupported
+      await enableWakeLock();
+    }
+    // If it failed, keepAwake will be false and pill will show off
+    if(keepAwake) speak("Keep awake on");
+  });
+
+  // service worker
+  if("serviceWorker" in navigator){
     navigator.serviceWorker.register("./sw.js").catch(()=>{});
   }
 
-  // Init
+  // init
   refreshSavedList();
   syncInputs();
   renderSteps();
   setButtons();
   setTime(0);
 
-  // iOS voices sometimes load async; this helps populate voices list early
-  try { speechSynthesis.getVoices?.(); } catch {}
+  // iOS voices sometimes populate async
+  try{ speechSynthesis.getVoices?.(); }catch{}
 </script>
 </body>
 </html>

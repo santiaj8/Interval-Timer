@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#0b0f14" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <title>Interval Routines</title>
+  <style>
+    :root { --bg:#0b0f14; --card:#131b24; --text:#e8eef6; --muted:#9bb0c6; --accent:#4da3ff; --danger:#ff5d5d; }
+    *{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial;}
+    body{margin:0;background:var(--bg);color:var(--text);padding:16px;}
+    h1{margin:0 0 12px;font-size:22px;}
+    .card{background:var(--card);border-radius:14px;padding:12px;margin:10px 0;box-shadow:0 8px 22px rgba(0,0,0,.25);}
+    label{display:block;font-size:12px;color:var(--muted);margin:8px 0 4px;}
+    input,select,button{width:100%;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:#0f1520;color:var(--text);}
+    button{background:var(--accent);border:none;font-weight:700;}
+    button.secondary{background:#243244;}
+    button.danger{background:var(--danger);}
+    .row{display:flex;gap:10px;}
+    .row > *{flex:1;}
+    .steps{margin-top:6px;}
+    .step{display:flex;gap:10px;align-items:center;padding:10px;border-radius:12px;background:#0f1520;border:1px solid rgba(255,255,255,.06);margin:8px 0;}
+    .step .meta{flex:1;}
+    .step .name{font-weight:700;margin:0 0 2px;}
+    .step .sub{color:var(--muted);font-size:12px;}
+    .step .btns{display:flex;flex-direction:column;gap:8px;min-width:96px;}
+    .step .btns button{padding:8px;font-size:13px;border-radius:10px;}
+    .big{font-size:42px;font-weight:800;letter-spacing:1px;text-align:center;margin:6px 0 0;}
+    .now{font-size:16px;text-align:center;color:var(--muted);margin-top:6px;}
+    .pillrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+    .pill{padding:8px 10px;border-radius:999px;background:#0f1520;border:1px solid rgba(255,255,255,.08);font-size:13px;color:var(--text);}
+    .pill.on{border-color:var(--accent);box-shadow:0 0 0 2px rgba(77,163,255,.2) inset;}
+    .footer{color:var(--muted);font-size:12px;margin-top:10px;line-height:1.35;}
+  </style>
+</head>
+<body>
+  <h1>Interval Routines</h1>
+
+  <div class="card">
+    <div class="row">
+      <div>
+        <label>Routine name</label>
+        <input id="routineName" placeholder="e.g., HIIT – 20/10" maxlength="60" />
+      </div>
+      <div>
+        <label>Rounds</label>
+        <input id="rounds" type="number" min="1" step="1" value="1" />
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>Step name</label>
+        <input id="stepName" placeholder="e.g., Jump rope / Rest" maxlength="60" />
+      </div>
+      <div>
+        <label>Seconds</label>
+        <input id="stepSeconds" type="number" min="1" step="1" value="30" />
+      </div>
+    </div>
+
+    <div class="row">
+      <div><button id="addStep">Add step</button></div>
+      <div><button class="secondary" id="saveRoutine">Save routine</button></div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>Load saved routine</label>
+        <select id="savedSelect"></select>
+      </div>
+      <div>
+        <label>&nbsp;</label>
+        <button class="secondary" id="loadRoutine">Load</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>Alerts</label>
+        <div class="pillrow">
+          <span class="pill on" id="soundPill">Sound</span>
+          <span class="pill on" id="vibePill">Vibrate</span>
+          <span class="pill" id="prepPill">3s Prep Beeps</span>
+        </div>
+      </div>
+      <div>
+        <label>&nbsp;</label>
+        <button class="danger" id="clearAll">Clear routine</button>
+      </div>
+    </div>
+
+    <div class="footer">
+      Tip: Add a "Rest" step like any other. Example: 40s Work → 20s Rest → 40s Work → 20s Rest.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="big" id="timeDisplay">00:00</div>
+    <div class="now" id="nowDisplay">Build a routine to begin.</div>
+
+    <div class="row" style="margin-top:10px;">
+      <button id="startBtn">Start</button>
+      <button class="secondary" id="pauseBtn" disabled>Pause</button>
+    </div>
+    <div class="row" style="margin-top:10px;">
+      <button class="secondary" id="skipBtn" disabled>Skip</button>
+      <button class="danger" id="stopBtn" disabled>Stop</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="font-weight:800;margin-bottom:6px;">Steps</div>
+    <div class="steps" id="steps"></div>
+  </div>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+
+  const STORE_KEY = "interval_routines_v1";
+  const CURRENT_KEY = "interval_current_v1";
+
+  /** @typedef {{name:string, seconds:number}} Step */
+  /** @typedef {{name:string, rounds:number, steps:Step[]}} Routine */
+
+  function loadStore() {
+    try { return JSON.parse(localStorage.getItem(STORE_KEY) || "{}"); }
+    catch { return {}; }
+  }
+  function saveStore(store) { localStorage.setItem(STORE_KEY, JSON.stringify(store)); }
+
+  function loadCurrent() {
+    try { return JSON.parse(localStorage.getItem(CURRENT_KEY) || "null"); }
+    catch { return null; }
+  }
+  function saveCurrent(r) { localStorage.setItem(CURRENT_KEY, JSON.stringify(r)); }
+
+  let routine = loadCurrent() || /** @type {Routine} */ ({ name:"", rounds:1, steps:[] });
+
+  let soundOn = true, vibeOn = true, prepBeeps = false;
+
+  // Timer state
+  let running = false;
+  let paused = false;
+  let tick = null;
+  let roundIdx = 0;      // 0-based
+  let stepIdx = 0;       // 0-based within routine.steps
+  let remaining = 0;     // seconds
+
+  function fmt(sec) {
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return String(m).padStart(2,"0") + ":" + String(s).padStart(2,"0");
+  }
+
+  function renderSteps() {
+    const wrap = $("steps");
+    if (routine.steps.length === 0) {
+      wrap.innerHTML = `<div style="color:var(--muted);">No steps yet.</div>`;
+      return;
+    }
+    wrap.innerHTML = routine.steps.map((st, i) => `
+      <div class="step">
+        <div class="meta">
+          <div class="name">${escapeHtml(st.name || "Step")}</div>
+          <div class="sub">${st.seconds}s</div>
+        </div>
+        <div class="btns">
+          <button class="secondary" onclick="moveUp(${i})">Up</button>
+          <button class="secondary" onclick="moveDown(${i})">Down</button>
+          <button class="danger" onclick="removeStep(${i})">Delete</button>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+  }
+
+  function syncInputs() {
+    $("routineName").value = routine.name || "";
+    $("rounds").value = String(routine.rounds || 1);
+  }
+
+  function setButtons() {
+    $("startBtn").disabled = routine.steps.length === 0 || running;
+    $("pauseBtn").disabled = !running;
+    $("skipBtn").disabled = !running;
+    $("stopBtn").disabled = !running;
+    $("pauseBtn").textContent = paused ? "Resume" : "Pause";
+  }
+
+  function refreshSavedList() {
+    const store = loadStore();
+    const sel = $("savedSelect");
+    const keys = Object.keys(store).sort((a,b)=>a.localeCompare(b));
+    sel.innerHTML = `<option value="">(Select)</option>` + keys.map(k => `<option value="${escapeHtml(k)}">${escapeHtml(k)}</option>`).join("");
+  }
+
+  function beep(freq=880, dur=120) {
+    if (!soundOn) return;
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.frequency.value = freq;
+      o.connect(g);
+      g.connect(ctx.destination);
+      o.start();
+      g.gain.setValueAtTime(0.2, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur/1000);
+      setTimeout(() => { o.stop(); ctx.close(); }, dur + 50);
+    } catch {}
+  }
+
+  function vibrate(ms=150) {
+    if (!vibeOn) return;
+    if (navigator.vibrate) navigator.vibrate(ms);
+  }
+
+  function setNowText(text) { $("nowDisplay").textContent = text; }
+  function setTime(sec) { $("timeDisplay").textContent = fmt(Math.max(0, sec)); }
+
+  function start() {
+    if (routine.steps.length === 0) return;
+    running = true; paused = false;
+    roundIdx = 0; stepIdx = 0;
+    remaining = routine.steps[0].seconds;
+    announceStep(true);
+    tick = setInterval(onTick, 1000);
+    setButtons();
+  }
+
+  function stop() {
+    running = false; paused = false;
+    if (tick) clearInterval(tick);
+    tick = null;
+    setButtons();
+    setTime(0);
+    setNowText("Stopped.");
+  }
+
+  function pauseToggle() {
+    if (!running) return;
+    paused = !paused;
+    if (paused) {
+      setNowText("Paused.");
+    } else {
+      announceStep(false);
+    }
+    setButtons();
+  }
+
+  function skip() {
+    if (!running) return;
+    advance();
+  }
+
+  function announceStep(isNew) {
+    const st = routine.steps[stepIdx];
+    const roundText = `Round ${roundIdx + 1}/${routine.rounds}`;
+    const stepText = `${st.name} (${st.seconds}s)`;
+    setNowText(`${roundText} • ${stepText}`);
+    setTime(remaining);
+    if (isNew) {
+      beep(880, 140);
+      vibrate(120);
+    }
+  }
+
+  function advance() {
+    // move to next step; if end, next round; if end, stop
+    stepIdx++;
+    if (stepIdx >= routine.steps.length) {
+      stepIdx = 0;
+      roundIdx++;
+      if (roundIdx >= routine.rounds) {
+        beep(660, 220); beep(880, 220);
+        vibrate(250);
+        stop();
+        setNowText("Finished ✅");
+        return;
+      }
+    }
+    remaining = routine.steps[stepIdx].seconds;
+    announceStep(true);
+  }
+
+  function onTick() {
+    if (!running || paused) return;
+
+    // optional prep beeps in last 3 seconds
+    if (prepBeeps && remaining <= 3 && remaining > 0) {
+      beep(520, 90);
+    }
+
+    remaining -= 1;
+    setTime(remaining);
+
+    if (remaining <= 0) {
+      // step complete
+      beep(980, 150);
+      vibrate(150);
+      advance();
+    }
+  }
+
+  // Step editing
+  window.removeStep = (i) => {
+    routine.steps.splice(i, 1);
+    saveCurrent(routine);
+    renderSteps();
+    setButtons();
+  };
+  window.moveUp = (i) => {
+    if (i <= 0) return;
+    const t = routine.steps[i-1];
+    routine.steps[i-1] = routine.steps[i];
+    routine.steps[i] = t;
+    saveCurrent(routine);
+    renderSteps();
+  };
+  window.moveDown = (i) => {
+    if (i >= routine.steps.length - 1) return;
+    const t = routine.steps[i+1];
+    routine.steps[i+1] = routine.steps[i];
+    routine.steps[i] = t;
+    saveCurrent(routine);
+    renderSteps();
+  };
+
+  // UI handlers
+  $("addStep").addEventListener("click", () => {
+    const name = $("stepName").value.trim() || "Step";
+    const sec = Math.max(1, parseInt($("stepSeconds").value || "30", 10));
+    routine.steps.push({ name, seconds: sec });
+    saveCurrent(routine);
+    $("stepName").value = "";
+    $("stepSeconds").value = "30";
+    renderSteps();
+    setButtons();
+  });
+
+  $("routineName").addEventListener("input", (e) => {
+    routine.name = e.target.value.trim();
+    saveCurrent(routine);
+  });
+  $("rounds").addEventListener("change", (e) => {
+    const v = Math.max(1, parseInt(e.target.value || "1", 10));
+    routine.rounds = v;
+    saveCurrent(routine);
+  });
+
+  $("saveRoutine").addEventListener("click", () => {
+    const nm = (routine.name || "").trim();
+    if (!nm) { alert("Give the routine a name first."); return; }
+    const store = loadStore();
+    store[nm] = routine;
+    saveStore(store);
+    refreshSavedList();
+    beep(880, 120); vibrate(80);
+  });
+
+  $("loadRoutine").addEventListener("click", () => {
+    const key = $("savedSelect").value;
+    if (!key) return;
+    const store = loadStore();
+    if (!store[key]) return;
+    routine = store[key];
+    saveCurrent(routine);
+    syncInputs();
+    renderSteps();
+    setButtons();
+    beep(880, 120); vibrate(80);
+  });
+
+  $("clearAll").addEventListener("click", () => {
+    if (!confirm("Clear the current routine steps?")) return;
+    routine.steps = [];
+    saveCurrent(routine);
+    renderSteps();
+    setButtons();
+    setTime(0);
+    setNowText("Cleared.");
+  });
+
+  $("startBtn").addEventListener("click", start);
+  $("pauseBtn").addEventListener("click", pauseToggle);
+  $("skipBtn").addEventListener("click", skip);
+  $("stopBtn").addEventListener("click", stop);
+
+  function togglePill(pillId, getterSetter) {
+    const el = $(pillId);
+    el.addEventListener("click", () => {
+      getterSetter();
+      el.classList.toggle("on");
+      // iOS often requires user interaction before audio works, so a tiny beep helps "unlock" audio.
+      beep(740, 80);
+    });
+  }
+  togglePill("soundPill", () => { soundOn = !soundOn; });
+  togglePill("vibePill", () => { vibeOn = !vibeOn; });
+  $("prepPill").addEventListener("click", () => { prepBeeps = !prepBeeps; $("prepPill").classList.toggle("on"); beep(740, 80); });
+
+  // Offline support (optional)
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("./sw.js").catch(()=>{});
+  }
+
+  // Init
+  refreshSavedList();
+  syncInputs();
+  renderSteps();
+  setButtons();
+  setTime(0);
+</script>
+</body>
+</html>

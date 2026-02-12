@@ -1,5 +1,5 @@
-const CACHE = "interval-routines-v2";
-const ASSETS = ["./", "./index.html", "./manifest.webmanifest"];
+const CACHE = "interval-routines-v3";
+const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./sw.js"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(ASSETS)));
@@ -7,7 +7,9 @@ self.addEventListener("install", (event) => {
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((keys) => Promise.all(keys.map((k) => (k === CACHE ? null : caches.delete(k)))))
+    caches.keys().then((keys) =>
+      Promise.all(keys.map((k) => (k === CACHE ? null : caches.delete(k))))
+    )
   );
 });
 

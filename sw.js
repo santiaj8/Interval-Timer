@@ -1,4 +1,4 @@
-const CACHE = "interval-routines-v1";
+const CACHE = "interval-routines-v2";
 const ASSETS = ["./", "./index.html", "./manifest.webmanifest"];
 
 self.addEventListener("install", (event) => {

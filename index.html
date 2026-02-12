@@ -2,38 +2,118 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1" />
   <meta name="theme-color" content="#0b0f14" />
   <link rel="manifest" href="manifest.webmanifest" />
   <title>Interval Routines</title>
   <style>
-    :root { --bg:#0b0f14; --card:#131b24; --text:#e8eef6; --muted:#9bb0c6; --accent:#4da3ff; --danger:#ff5d5d; }
-    *{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial;}
-    body{margin:0;background:var(--bg);color:var(--text);padding:16px;}
-    h1{margin:0 0 12px;font-size:22px;}
-    .card{background:var(--card);border-radius:14px;padding:12px;margin:10px 0;box-shadow:0 8px 22px rgba(0,0,0,.25);}
-    label{display:block;font-size:12px;color:var(--muted);margin:8px 0 4px;}
-    input,select,button{width:100%;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:#0f1520;color:var(--text);}
-    button{background:var(--accent);border:none;font-weight:700;}
-    button.secondary{background:#243244;}
-    button.danger{background:var(--danger);}
-    .row{display:flex;gap:10px;}
-    .row > *{flex:1;}
-    .steps{margin-top:6px;}
-    .step{display:flex;gap:10px;align-items:center;padding:10px;border-radius:12px;background:#0f1520;border:1px solid rgba(255,255,255,.06);margin:8px 0;}
-    .step .meta{flex:1;}
-    .step .name{font-weight:700;margin:0 0 2px;}
-    .step .sub{color:var(--muted);font-size:12px;}
-    .step .btns{display:flex;flex-direction:column;gap:8px;min-width:96px;}
-    .step .btns button{padding:8px;font-size:13px;border-radius:10px;}
-    .big{font-size:42px;font-weight:800;letter-spacing:1px;text-align:center;margin:6px 0 0;}
-    .now{font-size:16px;text-align:center;color:var(--muted);margin-top:6px;}
-    .pillrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
-    .pill{padding:8px 10px;border-radius:999px;background:#0f1520;border:1px solid rgba(255,255,255,.08);font-size:13px;color:var(--text);}
-    .pill.on{border-color:var(--accent);box-shadow:0 0 0 2px rgba(77,163,255,.2) inset;}
-    .footer{color:var(--muted);font-size:12px;margin-top:10px;line-height:1.35;}
+    :root {
+      --bg:#0b0f14;
+      --card:#131b24;
+      --text:#e8eef6;
+      --muted:#9bb0c6;
+      --accent:#4da3ff;
+      --danger:#ff5d5d;
+      --on:#1b3b5f;
+      --onBorder:#64b3ff;
+      --pillBg:#0f1520;
+      --pillBorder:rgba(255,255,255,.10);
+    }
+    * { box-sizing:border-box; font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial; }
+    body { margin:0; background:var(--bg); color:var(--text); padding:16px; }
+    h1 { margin:0 0 12px; font-size:22px; }
+    .card {
+      background:var(--card);
+      border-radius:14px;
+      padding:12px;
+      margin:10px 0;
+      box-shadow:0 8px 22px rgba(0,0,0,.25);
+    }
+    label { display:block; font-size:12px; color:var(--muted); margin:8px 0 4px; }
+
+    /* IMPORTANT for iOS: prevent zoom on focus by keeping input font-size >= 16px */
+    input, select, button {
+      width:100%;
+      padding:10px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.08);
+      background:var(--pillBg);
+      color:var(--text);
+      font-size:16px; /* prevents iOS zoom */
+      line-height:1.2;
+    }
+
+    button { background:var(--accent); border:none; font-weight:800; }
+    button.secondary { background:#243244; }
+    button.danger { background:var(--danger); }
+
+    .row { display:flex; gap:10px; }
+    .row > * { flex:1; }
+
+    .steps { margin-top:6px; }
+    .step {
+      display:flex;
+      gap:10px;
+      align-items:center;
+      padding:10px;
+      border-radius:12px;
+      background:var(--pillBg);
+      border:1px solid rgba(255,255,255,.06);
+      margin:8px 0;
+    }
+    .step .meta { flex:1; }
+    .step .name { font-weight:800; margin:0 0 2px; }
+    .step .sub { color:var(--muted); font-size:12px; }
+    .step .btns { display:flex; flex-direction:column; gap:8px; min-width:96px; }
+    .step .btns button { padding:8px; font-size:14px; border-radius:10px; }
+
+    .big { font-size:46px; font-weight:900; letter-spacing:1px; text-align:center; margin:6px 0 0; }
+    .now { font-size:16px; text-align:center; color:var(--muted); margin-top:6px; }
+
+    .pillrow { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+
+    .pill {
+      padding:10px 12px;
+      border-radius:999px;
+      background:var(--pillBg);
+      border:1px solid var(--pillBorder);
+      font-size:14px;
+      color:var(--text);
+      user-select:none;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+    }
+    /* MUCH more obvious active state */
+    .pill.on {
+      background:var(--on);
+      border-color:var(--onBorder);
+      box-shadow:0 0 0 3px rgba(100,179,255,.22) inset, 0 0 12px rgba(100,179,255,.12);
+    }
+    .pill .dot {
+      width:10px; height:10px; border-radius:999px;
+      background:rgba(255,255,255,.25);
+      box-shadow:0 0 0 2px rgba(0,0,0,.18) inset;
+    }
+    .pill.on .dot {
+      background:#7fe0ff;
+      box-shadow:0 0 10px rgba(127,224,255,.45);
+    }
+
+    .footer { color:var(--muted); font-size:12px; margin-top:10px; line-height:1.35; }
+
+    /* Flash overlay for obvious step transitions */
+    #flash {
+      position:fixed; inset:0;
+      background:#ffffff;
+      opacity:0;
+      pointer-events:none;
+      transition:opacity 120ms ease;
+      z-index:9999;
+    }
   </style>
 </head>
+
 <body>
   <h1>Interval Routines</h1>
 
@@ -45,7 +125,7 @@
       </div>
       <div>
         <label>Rounds</label>
-        <input id="rounds" type="number" min="1" step="1" value="1" />
+        <input id="rounds" type="number" min="1" step="1" value="1" inputmode="numeric" />
       </div>
     </div>
 
@@ -56,7 +136,7 @@
       </div>
       <div>
         <label>Seconds</label>
-        <input id="stepSeconds" type="number" min="1" step="1" value="30" />
+        <input id="stepSeconds" type="number" min="1" step="1" value="30" inputmode="numeric" />
       </div>
     </div>
 
@@ -72,17 +152,19 @@
       </div>
       <div>
         <label>&nbsp;</label>
-        <button class="secondary" id="loadRoutine">Load</button>
+        <button class="secondary" id="loadRoutine">Load as 1 step</button>
       </div>
     </div>
 
     <div class="row">
       <div>
-        <label>Alerts</label>
+        <label>Alerts (active = highlighted)</label>
         <div class="pillrow">
-          <span class="pill on" id="soundPill">Sound</span>
-          <span class="pill on" id="vibePill">Vibrate</span>
-          <span class="pill" id="prepPill">3s Prep Beeps</span>
+          <span class="pill on" id="soundPill"><span class="dot"></span>Sound</span>
+          <span class="pill on" id="vibePill"><span class="dot"></span>Vibrate</span>
+          <span class="pill on" id="voicePill"><span class="dot"></span>Voice</span>
+          <span class="pill" id="prepPill"><span class="dot"></span>3s Prep Beeps</span>
+          <span class="pill on" id="flashPill"><span class="dot"></span>Flash</span>
         </div>
       </div>
       <div>
@@ -92,7 +174,7 @@
     </div>
 
     <div class="footer">
-      Tip: Add a "Rest" step like any other. Example: 40s Work → 20s Rest → 40s Work → 20s Rest.
+      Start includes an automatic <b>5-second countdown</b>. Tip: Add a “Rest” step like any other.
     </div>
   </div>
 
@@ -111,15 +193,17 @@
   </div>
 
   <div class="card">
-    <div style="font-weight:800;margin-bottom:6px;">Steps</div>
+    <div style="font-weight:900;margin-bottom:6px;">Steps</div>
     <div class="steps" id="steps"></div>
   </div>
+
+  <div id="flash"></div>
 
 <script>
   const $ = (id) => document.getElementById(id);
 
-  const STORE_KEY = "interval_routines_v1";
-  const CURRENT_KEY = "interval_current_v1";
+  const STORE_KEY = "interval_routines_v2";
+  const CURRENT_KEY = "interval_current_v2";
 
   /** @typedef {{name:string, seconds:number}} Step */
   /** @typedef {{name:string, rounds:number, steps:Step[]}} Routine */
@@ -138,15 +222,28 @@
 
   let routine = loadCurrent() || /** @type {Routine} */ ({ name:"", rounds:1, steps:[] });
 
-  let soundOn = true, vibeOn = true, prepBeeps = false;
+  // Alert toggles
+  let soundOn = true;
+  let vibeOn = true;
+  let voiceOn = true;
+  let prepBeeps = false;
+  let flashOn = true;
 
   // Timer state
   let running = false;
   let paused = false;
   let tick = null;
-  let roundIdx = 0;      // 0-based
-  let stepIdx = 0;       // 0-based within routine.steps
-  let remaining = 0;     // seconds
+
+  let roundIdx = 0;     // 0-based
+  let stepIdx = 0;      // 0-based
+  let remaining = 0;    // seconds
+
+  // Start countdown state
+  let inCountdown = false;
+  let countdownRemaining = 0;
+
+  // One persistent audio context (iOS PWA reliable beeps)
+  let audioCtx = null;
 
   function fmt(sec) {
     const m = Math.floor(sec / 60);
@@ -154,6 +251,112 @@
     return String(m).padStart(2,"0") + ":" + String(s).padStart(2,"0");
   }
 
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+  }
+
+  function setButtons() {
+    $("startBtn").disabled = routine.steps.length === 0 || running;
+    $("pauseBtn").disabled = !running;
+    $("skipBtn").disabled = !running;
+    $("stopBtn").disabled = !running;
+    $("pauseBtn").textContent = paused ? "Resume" : "Pause";
+  }
+
+  function setNowText(text) { $("nowDisplay").textContent = text; }
+  function setTime(sec) { $("timeDisplay").textContent = fmt(Math.max(0, sec)); }
+
+  function categoriesFromTasks() { /* placeholder in case you add later */ }
+
+  function totalSecondsOfRoutine(r) {
+    const perRound = r.steps.reduce((acc, st) => acc + (Number(st.seconds) || 0), 0);
+    const rounds = Math.max(1, Number(r.rounds) || 1);
+    return perRound * rounds;
+  }
+
+  // ---------- Alerts ----------
+  function ensureAudio() {
+    if (!soundOn) return;
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === "suspended") audioCtx.resume().catch(()=>{});
+  }
+
+  function beep(freq = 880, dur = 140, gain = 0.40) {
+    if (!soundOn) return;
+    ensureAudio();
+    if (!audioCtx) return;
+
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+
+    o.frequency.value = freq;
+    o.connect(g);
+    g.connect(audioCtx.destination);
+
+    const t0 = audioCtx.currentTime;
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(gain, t0 + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur / 1000);
+
+    o.start(t0);
+    o.stop(t0 + dur / 1000 + 0.03);
+  }
+
+  function stepAlert() {
+    // Very noticeable triple-beep pattern
+    beep(1040, 120, 0.45);
+    setTimeout(() => beep(880, 120, 0.45), 170);
+    setTimeout(() => beep(740, 150, 0.45), 340);
+  }
+
+  function vibrate(ms = 180) {
+    if (!vibeOn) return;
+    if (navigator.vibrate) navigator.vibrate(ms);
+  }
+
+  function flash() {
+    if (!flashOn) return;
+    const f = $("flash");
+    f.style.opacity = "0.65";
+    setTimeout(() => f.style.opacity = "0", 160);
+  }
+
+  // Voice: iOS does not let web apps force volume above system volume.
+  // We set utterance.volume=1.0 (max), but actual loudness depends on device volume.
+  function pickVoice() {
+    try {
+      const voices = speechSynthesis.getVoices?.() || [];
+      // Prefer iOS "Samantha" if present; otherwise any en-US; otherwise first voice.
+      return voices.find(v => /Samantha/i.test(v.name)) ||
+             voices.find(v => /en-US/i.test(v.lang)) ||
+             voices.find(v => /^en/i.test(v.lang)) ||
+             voices[0] || null;
+    } catch {
+      return null;
+    }
+  }
+
+  function speak(text) {
+    if (!voiceOn) return;
+    if (!("speechSynthesis" in window)) return;
+
+    try {
+      const u = new SpeechSynthesisUtterance(String(text));
+      const v = pickVoice();
+      if (v) u.voice = v;
+
+      u.lang = (v && v.lang) ? v.lang : "en-US";
+      u.volume = 1.0; // max allowed by API
+      u.rate = 1.0;
+      u.pitch = 1.0;
+
+      // Cancel any queued speech and speak immediately
+      speechSynthesis.cancel();
+      speechSynthesis.speak(u);
+    } catch {}
+  }
+
+  // ---------- Render ----------
   function renderSteps() {
     const wrap = $("steps");
     if (routine.steps.length === 0) {
@@ -175,21 +378,9 @@
     `).join("");
   }
 
-  function escapeHtml(s) {
-    return String(s).replace(/[&<>"']/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
-  }
-
   function syncInputs() {
     $("routineName").value = routine.name || "";
     $("rounds").value = String(routine.rounds || 1);
-  }
-
-  function setButtons() {
-    $("startBtn").disabled = routine.steps.length === 0 || running;
-    $("pauseBtn").disabled = !running;
-    $("skipBtn").disabled = !running;
-    $("stopBtn").disabled = !running;
-    $("pauseBtn").textContent = paused ? "Resume" : "Pause";
   }
 
   function refreshSavedList() {
@@ -199,130 +390,7 @@
     sel.innerHTML = `<option value="">(Select)</option>` + keys.map(k => `<option value="${escapeHtml(k)}">${escapeHtml(k)}</option>`).join("");
   }
 
-let audioCtx = null;
-
-function ensureAudio() {
-  if (!soundOn) return;
-  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  if (audioCtx.state === "suspended") audioCtx.resume().catch(()=>{});
-}
-
-function beep(freq = 880, dur = 120) {
-  if (!soundOn) return;
-  ensureAudio();
-  if (!audioCtx) return;
-
-  const o = audioCtx.createOscillator();
-  const g = audioCtx.createGain();
-  o.frequency.value = freq;
-
-  o.connect(g);
-  g.connect(audioCtx.destination);
-
-  const t0 = audioCtx.currentTime;
-  g.gain.setValueAtTime(0.0001, t0);
-  g.gain.exponentialRampToValueAtTime(0.2, t0 + 0.01);
-  g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur / 1000);
-
-  o.start(t0);
-  o.stop(t0 + dur / 1000 + 0.02);
-}
-
-  function vibrate(ms=150) {
-    if (!vibeOn) return;
-    if (navigator.vibrate) navigator.vibrate(ms);
-  }
-
-  function setNowText(text) { $("nowDisplay").textContent = text; }
-  function setTime(sec) { $("timeDisplay").textContent = fmt(Math.max(0, sec)); }
-
-  function start() {
-    ensureAudio();
-    if (routine.steps.length === 0) return;
-    running = true; paused = false;
-    roundIdx = 0; stepIdx = 0;
-    remaining = routine.steps[0].seconds;
-    announceStep(true);
-    tick = setInterval(onTick, 1000);
-    setButtons();
-  }
-
-  function stop() {
-    running = false; paused = false;
-    if (tick) clearInterval(tick);
-    tick = null;
-    setButtons();
-    setTime(0);
-    setNowText("Stopped.");
-  }
-
-  function pauseToggle() {
-    if (!running) return;
-    paused = !paused;
-    if (paused) {
-      setNowText("Paused.");
-    } else {
-      announceStep(false);
-    }
-    setButtons();
-    ensureAudio();
-  }
-
-  function skip() {
-    if (!running) return;
-    advance();
-  }
-
-  function announceStep(isNew) {
-    const st = routine.steps[stepIdx];
-    const roundText = `Round ${roundIdx + 1}/${routine.rounds}`;
-    const stepText = `${st.name} (${st.seconds}s)`;
-    setNowText(`${roundText} • ${stepText}`);
-    setTime(remaining);
-    if (isNew) {
-      beep(880, 140);
-      vibrate(120);
-    }
-  }
-
-  function advance() {
-    // move to next step; if end, next round; if end, stop
-    stepIdx++;
-    if (stepIdx >= routine.steps.length) {
-      stepIdx = 0;
-      roundIdx++;
-      if (roundIdx >= routine.rounds) {
-        beep(660, 220); beep(880, 220);
-        vibrate(250);
-        stop();
-        setNowText("Finished ✅");
-        return;
-      }
-    }
-    remaining = routine.steps[stepIdx].seconds;
-    announceStep(true);
-  }
-
-  function onTick() {
-    if (!running || paused) return;
-
-    // optional prep beeps in last 3 seconds
-    if (prepBeeps && remaining <= 3 && remaining > 0) {
-      beep(520, 90);
-    }
-
-    remaining -= 1;
-    setTime(remaining);
-
-    if (remaining <= 0) {
-      // step complete
-      beep(980, 150);
-      vibrate(150);
-      advance();
-    }
-  }
-
-  // Step editing
+  // ---------- Step editing ----------
   window.removeStep = (i) => {
     routine.steps.splice(i, 1);
     saveCurrent(routine);
@@ -346,14 +414,166 @@ function beep(freq = 880, dur = 120) {
     renderSteps();
   };
 
-  // UI handlers
+  // ---------- Timer engine ----------
+  function announceStep(isNew) {
+    const st = routine.steps[stepIdx];
+    const roundText = `Round ${roundIdx + 1}/${routine.rounds}`;
+    const stepText = `${st.name} (${st.seconds}s)`;
+    setNowText(`${roundText} • ${stepText}`);
+    setTime(remaining);
+
+    if (isNew) {
+      flash();
+      stepAlert();
+      vibrate(220);
+      speak(st.name);
+    }
+  }
+
+  function advance() {
+    stepIdx++;
+    if (stepIdx >= routine.steps.length) {
+      stepIdx = 0;
+      roundIdx++;
+      if (roundIdx >= routine.rounds) {
+        flash();
+        // finish pattern
+        beep(660, 220, 0.50);
+        setTimeout(() => beep(880, 240, 0.50), 260);
+        vibrate(300);
+        stop();
+        setNowText("Finished ✅");
+        speak("Workout complete");
+        return;
+      }
+    }
+    remaining = routine.steps[stepIdx].seconds;
+    announceStep(true);
+  }
+
+  function onTick() {
+    if (!running || paused) return;
+
+    // Countdown mode
+    if (inCountdown) {
+      setNowText(`Starting in ${countdownRemaining}...`);
+      setTime(countdownRemaining);
+
+      // Beep each second; slightly higher for "1"
+      if (countdownRemaining > 1) beep(520, 80, 0.35);
+      if (countdownRemaining === 1) beep(780, 120, 0.45);
+
+      countdownRemaining -= 1;
+
+      if (countdownRemaining <= 0) {
+        inCountdown = false;
+        // Start first step
+        roundIdx = 0;
+        stepIdx = 0;
+        remaining = routine.steps[0].seconds;
+        announceStep(true);
+      }
+      return;
+    }
+
+    // Normal step mode
+    if (prepBeeps && remaining <= 3 && remaining > 0) {
+      beep(520, 80, 0.30);
+    }
+
+    remaining -= 1;
+    setTime(remaining);
+
+    if (remaining <= 0) {
+      // step complete
+      beep(980, 150, 0.45);
+      vibrate(150);
+      advance();
+    }
+  }
+
+  function start() {
+    if (routine.steps.length === 0) return;
+
+    running = true;
+    paused = false;
+
+    // Unlock audio and speech context via user gesture
+    ensureAudio();
+    try { speechSynthesis.cancel(); } catch {}
+
+    // Automatic 5-second countdown
+    inCountdown = true;
+    countdownRemaining = 5;
+    setButtons();
+
+    flash();
+    speak("Starting in five");
+    setTime(countdownRemaining);
+    setNowText(`Starting in ${countdownRemaining}...`);
+
+    if (tick) clearInterval(tick);
+    tick = setInterval(onTick, 1000);
+  }
+
+  function stop() {
+    running = false;
+    paused = false;
+    inCountdown = false;
+    countdownRemaining = 0;
+
+    if (tick) clearInterval(tick);
+    tick = null;
+
+    setButtons();
+    setTime(0);
+  }
+
+  function pauseToggle() {
+    if (!running) return;
+    paused = !paused;
+
+    if (!paused) {
+      ensureAudio();
+      setNowText("Resumed.");
+      // Re-announce current state for clarity
+      if (inCountdown) {
+        setNowText(`Starting in ${countdownRemaining}...`);
+      } else {
+        announceStep(false);
+      }
+    } else {
+      setNowText("Paused.");
+      try { speechSynthesis.cancel(); } catch {}
+    }
+    setButtons();
+  }
+
+  function skip() {
+    if (!running) return;
+
+    if (inCountdown) {
+      // Skip countdown: start immediately
+      inCountdown = false;
+      roundIdx = 0;
+      stepIdx = 0;
+      remaining = routine.steps[0].seconds;
+      announceStep(true);
+      return;
+    }
+    advance();
+  }
+
+  // ---------- UI handlers ----------
   $("addStep").addEventListener("click", () => {
     const name = $("stepName").value.trim() || "Step";
     const sec = Math.max(1, parseInt($("stepSeconds").value || "30", 10));
     routine.steps.push({ name, seconds: sec });
     saveCurrent(routine);
+
     $("stepName").value = "";
     $("stepSeconds").value = "30";
+
     renderSteps();
     setButtons();
   });
@@ -362,6 +582,7 @@ function beep(freq = 880, dur = 120) {
     routine.name = e.target.value.trim();
     saveCurrent(routine);
   });
+
   $("rounds").addEventListener("change", (e) => {
     const v = Math.max(1, parseInt(e.target.value || "1", 10));
     routine.rounds = v;
@@ -375,20 +596,37 @@ function beep(freq = 880, dur = 120) {
     store[nm] = routine;
     saveStore(store);
     refreshSavedList();
-    beep(880, 120); vibrate(80);
+    flash();
+    stepAlert();
+    vibrate(120);
+    speak("Saved");
   });
 
+  // Change #3: Load saved routine as ONE combined step (and clear current steps)
   $("loadRoutine").addEventListener("click", () => {
     const key = $("savedSelect").value;
     if (!key) return;
+
     const store = loadStore();
-    if (!store[key]) return;
-    routine = store[key];
+    const saved = store[key];
+    if (!saved) return;
+
+    const total = totalSecondsOfRoutine(saved);
+
+    // Clear current steps and insert single combined step
+    routine.steps = [{ name: key, seconds: total }];
+    routine.name = (routine.name || "").trim() || "Combined Routine";
+    routine.rounds = 1;
+
     saveCurrent(routine);
     syncInputs();
     renderSteps();
     setButtons();
-    beep(880, 120); vibrate(80);
+
+    flash();
+    stepAlert();
+    vibrate(140);
+    speak("Loaded");
   });
 
   $("clearAll").addEventListener("click", () => {
@@ -399,6 +637,7 @@ function beep(freq = 880, dur = 120) {
     setButtons();
     setTime(0);
     setNowText("Cleared.");
+    try { speechSynthesis.cancel(); } catch {}
   });
 
   $("startBtn").addEventListener("click", start);
@@ -406,20 +645,18 @@ function beep(freq = 880, dur = 120) {
   $("skipBtn").addEventListener("click", skip);
   $("stopBtn").addEventListener("click", stop);
 
-  function togglePill(pillId, getterSetter) {
-    const el = $(pillId);
-    el.addEventListener("click", () => {
-      getterSetter();
-      el.classList.toggle("on");
-      // iOS often requires user interaction before audio works, so a tiny beep helps "unlock" audio.
-      beep(740, 80);
-    });
+  function setPill(el, on) {
+    el.classList.toggle("on", !!on);
   }
-  togglePill("soundPill", () => { soundOn = !soundOn; });
-  togglePill("vibePill", () => { vibeOn = !vibeOn; });
-  $("prepPill").addEventListener("click", () => { prepBeeps = !prepBeeps; $("prepPill").classList.toggle("on"); beep(740, 80); });
 
-  // Offline support (optional)
+  // Toggle pills (Change #4 makes active state very obvious)
+  $("soundPill").addEventListener("click", () => { soundOn = !soundOn; setPill($("soundPill"), soundOn); ensureAudio(); beep(740, 80, 0.35); });
+  $("vibePill").addEventListener("click", () => { vibeOn = !vibeOn; setPill($("vibePill"), vibeOn); vibrate(80); });
+  $("voicePill").addEventListener("click", () => { voiceOn = !voiceOn; setPill($("voicePill"), voiceOn); if (voiceOn) speak("Voice on"); else try { speechSynthesis.cancel(); } catch {} });
+  $("prepPill").addEventListener("click", () => { prepBeeps = !prepBeeps; setPill($("prepPill"), prepBeeps); beep(740, 80, 0.35); });
+  $("flashPill").addEventListener("click", () => { flashOn = !flashOn; setPill($("flashPill"), flashOn); flash(); });
+
+  // Offline support
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("./sw.js").catch(()=>{});
   }
@@ -430,6 +667,9 @@ function beep(freq = 880, dur = 120) {
   renderSteps();
   setButtons();
   setTime(0);
+
+  // iOS voices sometimes load async; this helps populate voices list early
+  try { speechSynthesis.getVoices?.(); } catch {}
 </script>
 </body>
 </html>
